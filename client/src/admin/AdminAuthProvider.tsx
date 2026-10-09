@@ -28,6 +28,7 @@ export type Permission =
   | "payments.write"
   | "payments.export"
   | "audit.read"
+  | "users.manage"
   | "admin.manage";
 
 const ROLE_PERMISSIONS: Record<AdminRole, Permission[]> = {
@@ -40,6 +41,7 @@ const ROLE_PERMISSIONS: Record<AdminRole, Permission[]> = {
     "payments.write",
     "payments.export",
     "audit.read",
+    "users.manage",
     "admin.manage",
   ],
   ADMIN: [
@@ -51,6 +53,7 @@ const ROLE_PERMISSIONS: Record<AdminRole, Permission[]> = {
     "payments.write",
     "payments.export",
     "audit.read",
+    "users.manage",
   ],
   EDITOR: ["content.read", "content.write", "contact.read"],
   VIEWER: ["content.read", "contact.read"],

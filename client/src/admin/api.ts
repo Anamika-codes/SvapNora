@@ -115,6 +115,32 @@ export interface AuditEntry {
   createdAt: string;
 }
 
+export type ClientStatus = "PENDING" | "ACTIVE" | "SUSPENDED";
+export type AdminProjectStatus = "PLANNED" | "IN_PROGRESS" | "REVIEW" | "COMPLETED" | "ON_HOLD";
+
+export interface ClientAccount {
+  id: string;
+  email: string;
+  name: string;
+  company: string | null;
+  status: ClientStatus;
+  emailVerified: boolean;
+  createdAt: string;
+  lastLoginAt?: string | null;
+}
+
+export interface AdminClientProject {
+  id: string;
+  userId: string;
+  name: string;
+  description: string | null;
+  status: AdminProjectStatus;
+  progress: number;
+  dueDate: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export const adminApi = {
   overview: () => apiRequest<OverviewData>("/admin/overview"),
 
@@ -170,6 +196,26 @@ export const adminApi = {
   audit: {
     list: (params: Record<string, string | number | undefined>) =>
       apiRequest<Paginated<AuditEntry>>(`/admin/audit?${toQuery(params)}`),
+  },
+
+  clients: {
+    list: (params: Record<string, string | number | undefined>) =>
+      apiRequest<Paginated<ClientAccount>>(`/admin/users?${toQuery(params)}`),
+    create: (body: unknown) =>
+      apiRequest<{ user: ClientAccount; temporaryPassword?: string }>("/admin/users", { method: "POST", body }),
+    update: (id: string, body: unknown) =>
+      apiRequest<{ user: ClientAccount }>(`/admin/users/${id}`, { method: "PATCH", body }),
+    remove: (id: string) => apiRequest<{ ok: boolean }>(`/admin/users/${id}`, { method: "DELETE" }),
+    revoke: (id: string) => apiRequest<{ ok: boolean; revoked: number }>(`/admin/users/${id}/revoke-sessions`, { method: "POST" }),
+    resetPassword: (id: string) =>
+      apiRequest<{ ok: boolean; temporaryPassword: string; sent: boolean }>(`/admin/users/${id}/reset-password`, { method: "POST" }),
+    projects: (id: string) => apiRequest<{ items: AdminClientProject[] }>(`/admin/users/${id}/projects`),
+    createProject: (id: string, body: unknown) =>
+      apiRequest<{ project: AdminClientProject }>(`/admin/users/${id}/projects`, { method: "POST", body }),
+    updateProject: (projectId: string, body: unknown) =>
+      apiRequest<{ project: AdminClientProject }>(`/admin/users/projects/${projectId}`, { method: "PATCH", body }),
+    deleteProject: (projectId: string) =>
+      apiRequest<{ ok: boolean }>(`/admin/users/projects/${projectId}`, { method: "DELETE" }),
   },
 
   admins: {

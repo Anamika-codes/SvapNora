@@ -9,6 +9,7 @@ export type Permission =
   | "payments.write"
   | "payments.export"
   | "audit.read"
+  | "users.manage"
   | "admin.manage";
 
 const ROLE_PERMISSIONS: Record<AdminRole, ReadonlySet<Permission>> = {
@@ -21,6 +22,7 @@ const ROLE_PERMISSIONS: Record<AdminRole, ReadonlySet<Permission>> = {
     "payments.write",
     "payments.export",
     "audit.read",
+    "users.manage",
     "admin.manage",
   ]),
   ADMIN: new Set<Permission>([
@@ -32,6 +34,7 @@ const ROLE_PERMISSIONS: Record<AdminRole, ReadonlySet<Permission>> = {
     "payments.write",
     "payments.export",
     "audit.read",
+    "users.manage",
   ]),
   EDITOR: new Set<Permission>(["content.read", "content.write", "contact.read"]),
   VIEWER: new Set<Permission>(["content.read", "contact.read"]),

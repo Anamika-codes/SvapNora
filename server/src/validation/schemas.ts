@@ -120,3 +120,68 @@ export const adminCreateSchema = z.object({
   password: z.string().min(10, "Use at least 10 characters").max(400),
   role: z.enum(["OWNER", "ADMIN", "EDITOR", "VIEWER"]).default("VIEWER"),
 });
+
+// --- End-user accounts -------------------------------------------------------
+
+const password = z.string().min(10, "Use at least 10 characters").max(400);
+
+export const registerSchema = z.object({
+  name: z.string().trim().min(2, "Please enter your name").max(120),
+  email: z.string().trim().email("Please enter a valid email").max(200),
+  company: z.string().trim().max(160).optional(),
+  password,
+  consent: z.literal(true, {
+    errorMap: () => ({ message: "Please agree to the privacy notice" }),
+  }),
+});
+export type RegisterInput = z.infer<typeof registerSchema>;
+
+export const forgotPasswordSchema = z.object({
+  email: z.string().trim().email().max(200),
+});
+
+export const resetPasswordSchema = z.object({
+  token: z.string().min(10).max(400),
+  password,
+});
+
+export const verifyEmailSchema = z.object({
+  token: z.string().min(10).max(400),
+});
+
+export const changePasswordSchema = z.object({
+  currentPassword: z.string().min(1).max(400),
+  newPassword: password,
+});
+
+export const profileUpdateSchema = z.object({
+  name: z.string().trim().min(2).max(120).optional(),
+  company: z.string().trim().max(160).nullable().optional(),
+});
+
+// --- Admin: client accounts & portal projects --------------------------------
+
+export const clientCreateSchema = z.object({
+  name: z.string().trim().min(1).max(160),
+  email: z.string().trim().email().max(200),
+  company: z.string().trim().max(160).nullable().optional(),
+  password: password.optional(),
+  status: z.enum(["PENDING", "ACTIVE", "SUSPENDED"]).default("ACTIVE"),
+  sendInvite: z.coerce.boolean().default(true),
+});
+
+export const clientUpdateSchema = z.object({
+  name: z.string().trim().min(1).max(160).optional(),
+  company: z.string().trim().max(160).nullable().optional(),
+  status: z.enum(["PENDING", "ACTIVE", "SUSPENDED"]).optional(),
+});
+
+export const projectSchema = z.object({
+  name: z.string().trim().min(1).max(200),
+  description: z.string().trim().max(4000).nullable().optional(),
+  status: z.enum(["PLANNED", "IN_PROGRESS", "REVIEW", "COMPLETED", "ON_HOLD"]).default("PLANNED"),
+  progress: z.coerce.number().int().min(0).max(100).default(0),
+  dueDate: z.coerce.date().nullable().optional(),
+});
+
+export const projectUpdateSchema = projectSchema.partial();

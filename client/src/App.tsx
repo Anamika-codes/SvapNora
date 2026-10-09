@@ -16,6 +16,7 @@ const PaymentSuccess = lazy(() => import("./pages/payment/Success"));
 const PaymentCancel = lazy(() => import("./pages/payment/Cancel"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
+const AccountApp = lazy(() => import("./account/AccountApp"));
 const AdminApp = lazy(() => import("./admin/AdminApp"));
 
 function PageFallback() {
@@ -42,6 +43,7 @@ export default function App() {
           <Route path="/terms" element={<Terms />} />
           <Route path="/payment/success" element={<PaymentSuccess />} />
           <Route path="/payment/cancel" element={<PaymentCancel />} />
+          <Route path="/account/*" element={<AccountApp />} />
           <Route path="*" element={<NotFound />} />
         </Route>
         <Route path="/admin" element={<AdminApp />} />

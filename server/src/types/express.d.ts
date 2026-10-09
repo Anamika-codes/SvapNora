@@ -1,4 +1,4 @@
-import type { AdminRole, AdminUser } from "@prisma/client";
+import type { AdminRole, AdminUser, User } from "@prisma/client";
 
 declare global {
   namespace Express {
@@ -7,12 +7,21 @@ declare global {
         user: AdminUser;
         sessionId: string;
       };
+      user?: {
+        user: User;
+        sessionId: string;
+      };
     }
   }
 }
 
 export type AuthenticatedAdmin = {
   user: AdminUser;
+  sessionId: string;
+};
+
+export type AuthenticatedUser = {
+  user: User;
   sessionId: string;
 };
 

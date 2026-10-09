@@ -20,6 +20,9 @@ const envSchema = z.object({
 
   SESSION_SECRET: z.string().min(16),
   SESSION_TTL_HOURS: z.coerce.number().positive().default(12),
+  USER_SESSION_TTL_HOURS: z.coerce.number().positive().default(168),
+  VERIFY_TOKEN_TTL_HOURS: z.coerce.number().positive().default(24),
+  RESET_TOKEN_TTL_HOURS: z.coerce.number().positive().default(1),
   COOKIE_DOMAIN: z.string().default(""),
   COOKIE_SECURE: booleanish.default(false),
   TRUST_PROXY: booleanish.default(false),
@@ -89,5 +92,7 @@ function loadEnv(): AppEnv {
 export const env = loadEnv();
 
 export const SESSION_COOKIE = "svapnora_session";
+export const USER_SESSION_COOKIE = "svapnora_user_session";
 export const CSRF_COOKIE = "svapnora_csrf";
 export const SESSION_MAX_AGE_MS = env.SESSION_TTL_HOURS * 60 * 60 * 1000;
+export const USER_SESSION_MAX_AGE_MS = env.USER_SESSION_TTL_HOURS * 60 * 60 * 1000;

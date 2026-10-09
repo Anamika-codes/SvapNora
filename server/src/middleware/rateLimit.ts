@@ -27,6 +27,17 @@ export const contactLimiter = rateLimit({
   },
 });
 
+/** Account actions (signup, password reset, resend verification). */
+export const accountLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 20,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    error: { code: "RATE_LIMITED", message: "Too many requests. Please try again later." },
+  },
+});
+
 /** Generic API limiter as a coarse safety net. */
 export const apiLimiter = rateLimit({
   windowMs: 60 * 1000,

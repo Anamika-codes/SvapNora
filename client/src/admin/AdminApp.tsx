@@ -10,6 +10,7 @@ import ContactSubmissions from "./ContactSubmissions";
 import Content from "./Content";
 import AuditLog from "./AuditLog";
 import Admins from "./Admins";
+import Clients from "./Clients";
 
 function AdminRoutes() {
   const { admin, loading } = useAdminAuth();
@@ -32,6 +33,7 @@ function AdminRoutes() {
         <Route path="/admin/payments/:id" element={<PaymentDetail />} />
         <Route path="/admin/contact" element={<ContactSubmissions />} />
         <Route path="/admin/content" element={<Content />} />
+        <Route path="/admin/clients" element={<Clients />} />
         <Route path="/admin/audit" element={<AuditLog />} />
         <Route path="/admin/admins" element={<Admins />} />
         <Route path="*" element={<Navigate to="/admin" replace />} />

@@ -8,11 +8,12 @@ import cookieParser from "cookie-parser";
 import pinoHttp from "pino-http";
 import { env } from "./env";
 import { logger } from "./logger";
-import { attachAdmin } from "./middleware/auth";
+import { attachAdmin, attachUser } from "./middleware/auth";
 import { verifyCsrf } from "./middleware/csrf";
 import { apiLimiter } from "./middleware/rateLimit";
 import { errorHandler, notFoundHandler } from "./middleware/error";
 import { authRouter } from "./routes/auth";
+import { accountRouter } from "./routes/account";
 import { contactRouter } from "./routes/contact";
 import { contentRouter } from "./routes/content";
 import { adminRouter } from "./routes/admin";
@@ -51,6 +52,7 @@ export function createApp() {
   app.use(express.urlencoded({ extended: false }));
   app.use(cookieParser());
   app.use(attachAdmin);
+  app.use(attachUser);
 
   app.get("/api/health", (_req, res) => {
     res.json({ ok: true, service: "svapnora-api", time: new Date().toISOString() });
@@ -61,6 +63,7 @@ export function createApp() {
 
   app.use("/api", apiLimiter);
   app.use("/api/auth", authRouter);
+  app.use("/api/account", verifyCsrf, accountRouter);
   app.use("/api/contact", contactRouter);
   app.use("/api/content", contentRouter);
   app.use("/api/admin", verifyCsrf, adminRouter);

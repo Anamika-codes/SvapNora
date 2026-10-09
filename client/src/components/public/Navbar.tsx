@@ -3,6 +3,7 @@ import { Link, NavLink, useLocation } from "react-router-dom";
 import { Menu, X, ArrowRight } from "lucide-react";
 import { Logo } from "./Logo";
 import { ThemeToggle } from "./ThemeToggle";
+import { useUserAuth } from "../../account/UserAuthProvider";
 
 const LINKS = [
   { to: "/glowlang", label: "GlowLang" },
@@ -17,6 +18,7 @@ export function Navbar() {
   const [open, setOpen] = useState(false);
   const location = useLocation();
   const panelRef = useRef<HTMLDivElement>(null);
+  const { user } = useUserAuth();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 12);
@@ -74,6 +76,12 @@ export function Navbar() {
         </div>
 
         <div className="flex items-center gap-2">
+          <Link
+            to={user ? "/account" : "/account/login"}
+            className="hidden rounded-full px-3.5 py-2 text-sm font-medium text-muted transition-colors hover:text-ink sm:inline-flex"
+          >
+            {user ? "Dashboard" : "Sign in"}
+          </Link>
           <ThemeToggle className="hidden sm:inline-flex" />
           <Link to="/glowlang" className="btn-primary btn-sm hidden sm:inline-flex">
             Explore GlowLang
@@ -112,6 +120,12 @@ export function Navbar() {
               {link.label}
             </NavLink>
           ))}
+          <Link
+            to={user ? "/account" : "/account/login"}
+            className="rounded-xl px-4 py-3 text-sm font-medium text-muted hover:bg-surface-2 hover:text-ink"
+          >
+            {user ? "My dashboard" : "Sign in"}
+          </Link>
           <div className="mt-2 flex items-center gap-2">
             <Link to="/glowlang" className="btn-primary flex-1">
               Explore GlowLang

@@ -80,6 +80,112 @@ model AdminAuditLog {
 }
 
 // -----------------------------------------------------------------------------
+// End-user accounts (public signup + admin-invited client portal)
+//
+// Deliberately separate from AdminUser: a person may be both an administrator
+// and an end user, and the two contexts use distinct session cookies so they
+// never share trust. ClientProject holds admin-managed portal content.
+// -----------------------------------------------------------------------------
+
+enum UserStatus {
+  PENDING
+  ACTIVE
+  SUSPENDED
+}
+
+enum UserSource {
+  SELF_SIGNUP
+  INVITED
+}
+
+enum UserTokenType {
+  EMAIL_VERIFICATION
+  PASSWORD_RESET
+}
+
+enum ProjectStatus {
+  PLANNED
+  IN_PROGRESS
+  REVIEW
+  COMPLETED
+  ON_HOLD
+}
+
+model User {
+  id            String     @id @default(cuid())
+  email         String     @unique
+  name          String
+  company       String?
+  passwordHash  String
+  status        UserStatus @default(PENDING)
+  emailVerified Boolean    @default(false)
+  source        UserSource @default(SELF_SIGNUP)
+  lastLoginAt   DateTime?
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  sessions UserSession[]
+  tokens   UserToken[]
+  projects ClientProject[]
+
+  @@index([status])
+  @@index([createdAt])
+}
+
+model UserSession {
+  id         String    @id @default(cuid())
+  userId     String
+  /// HMAC-SHA256 hash of the opaque session token. Raw token only in the cookie.
+  tokenHash  String    @unique
+  ip         String?
+  userAgent  String?
+  expiresAt  DateTime
+  revokedAt  DateTime?
+  createdAt  DateTime  @default(now())
+  lastSeenAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+/// Single-use email-verification and password-reset tokens. Only the hash is
+/// stored; the raw value is delivered by email.
+model UserToken {
+  id        String        @id @default(cuid())
+  userId    String
+  type      UserTokenType
+  tokenHash String        @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime      @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, type])
+  @@index([expiresAt])
+}
+
+/// Admin-managed portal content shown to a client on their dashboard.
+model ClientProject {
+  id          String        @id @default(cuid())
+  userId      String
+  name        String
+  description String?
+  status      ProjectStatus @default(PLANNED)
+  progress    Int           @default(0)
+  dueDate     DateTime?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([status])
+}
+
+// -----------------------------------------------------------------------------
 // Content management
 // -----------------------------------------------------------------------------
 

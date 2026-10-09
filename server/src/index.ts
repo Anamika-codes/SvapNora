@@ -3,6 +3,7 @@ import { env } from "./env";
 import { logger } from "./logger";
 import { prisma } from "./db";
 import { purgeExpiredSessions } from "./services/authService";
+import { purgeExpiredUserArtifacts } from "./services/userAuthService";
 
 const app = createApp();
 
@@ -20,6 +21,13 @@ const purgeInterval = setInterval(
         if (count > 0) logger.info({ count }, "purged expired sessions");
       })
       .catch((err) => logger.error({ err }, "session purge failed"));
+    purgeExpiredUserArtifacts()
+      .then(({ sessions, tokens }) => {
+        if (sessions > 0 || tokens > 0) {
+          logger.info({ sessions, tokens }, "purged expired user sessions/tokens");
+        }
+      })
+      .catch((err) => logger.error({ err }, "user artifact purge failed"));
   },
   60 * 60 * 1000,
 );

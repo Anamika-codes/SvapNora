@@ -7,6 +7,7 @@ import {
   FileText,
   ScrollText,
   Users,
+  Building2,
   LogOut,
   Menu,
   X,
@@ -29,6 +30,7 @@ const NAV: NavItem[] = [
   { to: "/admin/payments", label: "Payments", icon: CreditCard, permission: "payments.read" },
   { to: "/admin/contact", label: "Messages", icon: Mail, permission: "contact.read" },
   { to: "/admin/content", label: "Content", icon: FileText, permission: "content.read" },
+  { to: "/admin/clients", label: "Clients", icon: Building2, permission: "users.manage" },
   { to: "/admin/audit", label: "Audit log", icon: ScrollText, permission: "audit.read" },
   { to: "/admin/admins", label: "Administrators", icon: Users, permission: "admin.manage" },
 ];

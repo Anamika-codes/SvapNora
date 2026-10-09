@@ -24,6 +24,28 @@ export function isEmailConfigured(): boolean {
   return env.EMAIL_PROVIDER === "smtp" && Boolean(env.SMTP_HOST) && Boolean(env.CONTACT_TO_EMAIL);
 }
 
+/** True when SMTP is usable for transactional mail (no contact inbox needed). */
+export function isTransactionalEmailConfigured(): boolean {
+  return env.EMAIL_PROVIDER === "smtp" && Boolean(env.SMTP_HOST);
+}
+
+async function sendMail(message: {
+  to: string;
+  subject: string;
+  text: string;
+  html?: string;
+}): Promise<boolean> {
+  const tx = getTransporter();
+  if (!tx) return false;
+  try {
+    await tx.sendMail({ from: env.EMAIL_FROM, ...message });
+    return true;
+  } catch (err) {
+    logger.error({ err, subject: message.subject }, "failed to send email");
+    return false;
+  }
+}
+
 export interface ContactEmail {
   name: string;
   email: string;
@@ -60,4 +82,54 @@ export async function sendContactNotification(payload: ContactEmail): Promise<bo
     logger.error({ err }, "failed to send contact notification email");
     return false;
   }
+}
+
+export async function sendVerificationEmail(to: string, name: string, url: string): Promise<boolean> {
+  return sendMail({
+    to,
+    subject: "Verify your SvapNora account",
+    text: [
+      `Hi ${name},`,
+      "",
+      "Confirm your email address to activate your SvapNora account:",
+      url,
+      "",
+      "If you did not create this account you can ignore this message.",
+    ].join("\n"),
+  });
+}
+
+export async function sendPasswordResetEmail(to: string, name: string, url: string): Promise<boolean> {
+  return sendMail({
+    to,
+    subject: "Reset your SvapNora password",
+    text: [
+      `Hi ${name},`,
+      "",
+      "Use the link below to choose a new password:",
+      url,
+      "",
+      "If you did not request this, you can safely ignore this email.",
+    ].join("\n"),
+  });
+}
+
+export async function sendClientWelcomeEmail(
+  to: string,
+  name: string,
+  options: { temporaryPassword?: string; resetUrl?: string },
+): Promise<boolean> {
+  const lines = [
+    `Hi ${name},`,
+    "",
+    "A SvapNora client account has been created for you.",
+  ];
+  if (options.temporaryPassword) {
+    lines.push("", `Temporary password: ${options.temporaryPassword}`, "Please change it after signing in.");
+  }
+  if (options.resetUrl) {
+    lines.push("", "You can also set your own password here:", options.resetUrl);
+  }
+  lines.push("", "Sign in at your SvapNora account page.");
+  return sendMail({ to, subject: "Your SvapNora client account", text: lines.join("\n") });
 }

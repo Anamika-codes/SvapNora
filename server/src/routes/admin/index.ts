@@ -6,6 +6,7 @@ import { paymentsAdminRouter } from "./payments";
 import { overviewAdminRouter } from "./overview";
 import { auditAdminRouter } from "./audit";
 import { adminsAdminRouter } from "./admins";
+import { usersAdminRouter } from "./users";
 
 /**
  * Admin API. Every route below requires an authenticated session. Individual
@@ -19,5 +20,6 @@ adminRouter.use("/overview", overviewAdminRouter);
 adminRouter.use("/content", contentAdminRouter);
 adminRouter.use("/contact", contactAdminRouter);
 adminRouter.use("/payments", paymentsAdminRouter);
+adminRouter.use("/users", usersAdminRouter);
 adminRouter.use("/audit", auditAdminRouter);
 adminRouter.use("/admins", adminsAdminRouter);
